@@ -8,7 +8,7 @@ const SIGNALING_URL = "wss://【立ち上げたサーバのホスト名】/signa
 const WEBRTC_CHANNEL_ID = "WebRTC_Channel";
 const WEBRTC_CLIENT_ID = "WebRTC_Client";
 const WEBRTC_CHANNEL_PASSWORD = "password";
-const BACKGROUND_IMAGE_URL = "./image/rectangle_large_type_2_1b5a3cb412dffc38339fd16cc9290b19.png";
+const BACKGROUND_IMAGE_URL = "./image/onepiece01_luffy2.png";
 
 var g_webrtcDirect = null;
 var g_stream = null;

@@ -57,7 +57,7 @@
           <label>パスワード</label> <input type="password" class="form-control" v-model="config.password"><br>
           <label>クライアントID</label> <input type="text" class="form-control" v-model="config.clientId">
         </div>
-        <label>シグナリング接続先</label> <input type="text" class="form-control" v-model="signalingUrl"><br>
+        <label>シグナリング接続先</label> {{signalingUrl}}<br>
         <label>is_signaling</label> {{is_signaling}} <label>is_webrtc</label> {{is_webrtc}} <label>remoteClientId</label> {{remoteClientId}}<br>
         <button v-if="!is_signaling" class="btn btn-primary btn-lg" v-on:click="start_webrtc">Start</button>
         <button v-else class="btn btn-primary btn-lg" v-on:click="stop_webrtc">Stop</button>

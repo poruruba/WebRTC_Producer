@@ -74,7 +74,7 @@ var vue_options = {
         },
         attach_display: async function(){
             try{
-                if( !navigator.mediaDevices || navigator.mediaDevices.getDisplayMedia )
+                if( !navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia )
                     throw new Error("not display stream");
 
                 var stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });

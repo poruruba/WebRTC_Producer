@@ -6,6 +6,7 @@ class WebrtcDirect {
         this.peerConnection = null;
         this.dataChannel = null;
         this.remoteClientId = null;
+        this.image = new Image();
 
         this.signalingClient = new WebrtcSignalingClient("direct", signalingUrl);
 
@@ -46,55 +47,53 @@ class WebrtcDirect {
         this.prepareDefaultStream(options);
     }
 
+    changeImageFile(file){
+        if( file )
+            this.image.src = URL.createObjectURL(file);
+        else
+            this.image.src = null;
+    }
+
     prepareDefaultStream(options = {}) {
         const {
-            width = 320,
-            height = 240,
+            width = 640,
+            height = 480,
             backgroundColor = 'black',
             textColor = 'white',
             font = '16px sans-serif',
             message = 'WebRTC接続中',
             imageSrc = null,
-            interval = 2000,
+            interval = 3000,
             imageFitMode = 'contain' // 'contain' | 'cover' | 'stretch'
         } = options;
 
         const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
         const ctx = canvas.getContext('2d', { alpha: false });
-
-        function drawImageFit(ctx, img, canvas, mode) {
-            if (mode === 'stretch') {
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            }else{
-                const imgRatio = img.width / img.height;
-                const canvasRatio = canvas.width / canvas.height;
-
-                let drawWidth, drawHeight;
-                if ((mode == 'contain' && imgRatio > canvasRatio) || (mode == 'cover' && imgRatio < canvasRatio)) {
-                    drawWidth = canvas.width;
-                    drawHeight = canvas.width / imgRatio;
-                } else {
-                    drawHeight = canvas.height;
-                    drawWidth = canvas.height * imgRatio;
-                }
-
-                const offsetX = (canvas.width - drawWidth) / 2;
-                const offsetY = (canvas.height - drawHeight) / 2;
-
-                ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-            }
-        }
 
         const img = imageSrc ? new Image() : null;
 
         const drawLoop = () => {
+            if (this.image.src){
+                if(this.image.complete && this.image.naturalWidth > 0) {
+                    if( canvas.width != this.image.naturalWidth || canvas.height != this.image.naturalHeight){
+                        canvas.width = this.image.naturalWidth;
+                        canvas.height = this.image.naturalHeight;
+                }
+                    ctx.drawImage(this.image, 0, 0);
+                }else{
+                    ctx.fillStyle = backgroundColor;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            }else{
+                if( canvas.width != width || canvas.height != height){
+                    canvas.width = width;
+                    canvas.height = height;
+        }
             ctx.fillStyle = backgroundColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             if (img && img.complete && img.naturalWidth > 0) {
-                drawImageFit(ctx, img, canvas, imageFitMode);
+                    this.drawImageFit(ctx, img, canvas, imageFitMode);
             } else {
                 ctx.fillStyle = textColor;
                 ctx.font = font;
@@ -103,11 +102,10 @@ class WebrtcDirect {
                 ctx.fillText(message, canvas.width / 2, canvas.height / 2);
             }
         }
-
-        if (img){
-            img.src = imageSrc;
-            img.onload = drawLoop;
         }
+
+        if (img)
+            img.src = imageSrc;
         drawLoop();
         setInterval(drawLoop, interval);
 
@@ -351,7 +349,7 @@ class WebrtcDirect {
         this.sendOffset = 0;
         var data = {
             type: "binary",
-            length: this.sendArray.length,
+            length: this.sendArray.byteLength,
             fname: fname || "notitled.bin",
             mime_type: mime_type || "application/octet-stream",
             hash: hash
@@ -386,12 +384,13 @@ class WebrtcDirect {
                         array.set(chunk, offset);
                         offset += chunk.length;
                     }
-                    console.log(array);
+//                    console.log(array);
                     this.recvChunks = null;
 
                     var hash = await this.hashUint8Array(array)
                     if( info.length != this.recvOffset || hash != info.hash ){
                         console.error("check mismatch");
+                        alert("ファイル受信失敗");
                         return null;
                     }
                     info.array = array;
@@ -407,5 +406,28 @@ class WebrtcDirect {
             .map(b => b.toString(16).padStart(2, "0"))
             .join("");
         return hex;
+    }
+
+    drawImageFit(ctx, img, canvas, mode){
+        if (mode === 'stretch') {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        }else{
+            const imgRatio = img.width / img.height;
+            const canvasRatio = canvas.width / canvas.height;
+
+            let drawWidth, drawHeight;
+            if ((mode == 'contain' && imgRatio > canvasRatio) || (mode == 'cover' && imgRatio < canvasRatio)) {
+                drawWidth = canvas.width;
+                drawHeight = canvas.width / imgRatio;
+            } else {
+                drawHeight = canvas.height;
+                drawWidth = canvas.height * imgRatio;
+            }
+
+            const offsetX = (canvas.width - drawWidth) / 2;
+            const offsetY = (canvas.height - drawHeight) / 2;
+
+            ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+        }
     }
 }

@@ -29,6 +29,7 @@ var vue_options = {
         received_datetime: 0,
         received_message: "",
         received_remoteClientId: "",
+        selecting_stream: "default",
     },
     computed: {
     },
@@ -65,12 +66,19 @@ var vue_options = {
         },
 
         attach_default: async function(){
+            try{
+                g_webrtcDirect.changeImageFile(null);
             g_webrtcDirect.replaceTrack(null);
 
             const video = document.querySelector('#localcamera_view');
             video.src = null;
             video.srcObject = null;
             this.video_ended = false;
+                this.selecting_stream = "default";
+            }catch(error){
+                console.error(error);
+                alert(error);
+            }
         },
         attach_display: async function(){
             try{
@@ -83,7 +91,8 @@ var vue_options = {
                 video.srcObject = stream;
                 this.video_ended = false;
 
-                g_webrtcDirect.replaceTrack(stream);
+                await g_webrtcDirect.replaceTrack(stream);
+                this.selecting_stream = "display";
             }catch(error){
                 console.error(error);
                 alert(error);
@@ -104,14 +113,32 @@ var vue_options = {
                 video.srcObject = stream;
                 this.video_ended = false;
 
-                g_webrtcDirect.replaceTrack(stream);
+                await g_webrtcDirect.replaceTrack(stream);
+                this.selecting_stream = "camera";
             }catch(error){
                 console.error(error);
                 alert(error);
             }
         },
+        attach_imageFile: async function(files){
+            if( files.length == 0 )
+                return;
 
-        change_videoFile: async function(files){
+            try{
+                var file = files[0];
+                var image = document.querySelector("#imagefile");
+                image.src = URL.createObjectURL(file);
+
+                g_webrtcDirect.changeImageFile(file);
+                this.selecting_stream = "default";
+
+                await g_webrtcDirect.replaceTrack(null);
+            }catch(error){
+                console.error(error);
+                alert(error);
+            }
+        },
+        attach_videoFile: async function(files){
             if( files.length == 0 )
                 return;
 
@@ -123,6 +150,7 @@ var vue_options = {
                 video.src = url;
                 this.video_ended = true;
                 await video.play();
+                this.selecting_stream = "video";
             }catch(error){
                 console.error(error);
                 alert(error);
@@ -134,7 +162,7 @@ var vue_options = {
                 this.video_ended = false;
                 const video = document.querySelector('#localcamera_view');
                 const stream = video.captureStream();
-                g_webrtcDirect.replaceTrack(stream);
+                await g_webrtcDirect.replaceTrack(stream);
             }
         },
 
@@ -146,14 +174,25 @@ var vue_options = {
             if( files.length == 0 )
                 return;
 
+            try{
             var file = files[0];
             var buffer = await file.arrayBuffer();
-            g_webrtcDirect.sendBinary(buffer, file.name, file.type);
+                await g_webrtcDirect.sendBinary(buffer, file.name, file.type);
+                this.toast_show("ファイル送信を開始しました。");
+            }catch(error){
+                console.error(error);
+                alert(error);
+            }
         },
 
         send_message: async function(){
+            try{
             await g_webrtcDirect.sendMessage(this.message);
             this.message = "";
+            }catch(error){
+                console.error(error);
+                alert(error);
+            }
         },
 
         goto_fullscreen() {

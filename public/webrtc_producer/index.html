@@ -66,7 +66,7 @@
         <div class="row">
           <div class="col-xs-8">
             <label>リモート映像</label> <button class="btn btn-default btn-xs" v-on:click="goto_fullscreen">全画面表示</button><br>
-            <video id="remotecamera_view" class="img-responsive" autoplay controls></video>
+            <video id="remotecamera_view" class="img-responsive" width="640px" height="480px" autoplay controls></video>
           </div>
           <div class="col-xs-4">
             <label>ローカル映像</label>
@@ -87,7 +87,11 @@
             <option value="user">user</option>
           </select>
         </div><br>
-        <label>ビデオ/オーディオファイル</label><comp_file id="fileInput" accept="video/*, audio/*" v-bind:callback="change_videoFile"></comp_file>
+        <label>ビデオ/オーディオファイル</label> <comp_file id="fileInput" accept="video/*, audio/*" v-bind:callback="attach_videoFile"></comp_file>
+        <br>
+        <label>イメージファイル</label>
+        <comp_file id="fileInput" accept="image/*" v-bind:callback="attach_imageFile"></comp_file>
+        <img id="imagefile" class="img-responsive" v-show="selecting_stream=='default'"><br>
 
         <hr>
         <label>ファイル送信</label> <comp_file id="fileInput" v-bind:callback="send_file"></comp_file>

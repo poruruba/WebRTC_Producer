@@ -78,7 +78,7 @@ class WebrtcDirect {
                     if( canvas.width != this.image.naturalWidth || canvas.height != this.image.naturalHeight){
                         canvas.width = this.image.naturalWidth;
                         canvas.height = this.image.naturalHeight;
-                }
+                    }
                     ctx.drawImage(this.image, 0, 0);
                 }else{
                     ctx.fillStyle = backgroundColor;
@@ -88,20 +88,20 @@ class WebrtcDirect {
                 if( canvas.width != width || canvas.height != height){
                     canvas.width = width;
                     canvas.height = height;
-        }
-            ctx.fillStyle = backgroundColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+                ctx.fillStyle = backgroundColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            if (img && img.complete && img.naturalWidth > 0) {
+                if (img && img.complete && img.naturalWidth > 0) {
                     this.drawImageFit(ctx, img, canvas, imageFitMode);
-            } else {
-                ctx.fillStyle = textColor;
-                ctx.font = font;
-                ctx.textAlign = 'center';
+                } else {
+                    ctx.fillStyle = textColor;
+                    ctx.font = font;
+                    ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+                    ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+                }
             }
-        }
         }
 
         if (img)
@@ -431,3 +431,4 @@ class WebrtcDirect {
         }
     }
 }
+
